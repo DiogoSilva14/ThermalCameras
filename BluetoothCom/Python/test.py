@@ -1,7 +1,9 @@
 import bluetooth
-from time import time
+import cv2
+import sys
+import numpy as np
 
-target_name = "ESP32IR"
+target_name = "Lepton IR"
 target_address = None
 
 nearby_devices = bluetooth.discover_devices()
@@ -18,13 +20,34 @@ port = 1
 sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 sock.connect((target_address, port))
 
-sock.send("Hello!")
-milliseconds = int(time()*1000)
+frame = []
 
-data = sock.recv(1000)
+still_connected = True
 
-delay = int(time()*1000) - milliseconds
+while(still_connected):
+	try:
+		data = sock.recv(1000)
+	except:
+		still_connected = False
 
-print("Delay: " + str(delay) + " ms")
+	for byte in data:
+		frame.append(byte)
+		
+		
+		#cv2.imshow("Lepton IR", decoded)
+	
+#		if byte == ord('<'):
+#			frame = ''
+#			print("Received BOF")
+#		elif byte == ord('>'):
+#			print("Received EOF")
+#			
+#			print(frame)
+#			
+#		else:
+#			frame += str(byte)
 
-print(data)
+decoded = cv2.imdecode(np.frombuffer(frame, np.uint8), -1)
+			
+print(type(decoded))
+		
