@@ -19,6 +19,7 @@ void setup() {
     Serial.println(IP);
 
     server.begin();
+    server.setNoDelay(true);
 
     if(!SPIFFS.begin(true)){
         Serial.println("An Error has occurred while mounting SPIFFS");
@@ -31,6 +32,8 @@ void loop(){
     if(client){
         writeBMPFile(client);
     }
+
+    delay(1000);
 }
 
 void writeBMPFile(WiFiClient client){
@@ -47,7 +50,13 @@ void writeBMPFile(WiFiClient client){
         filearray += byte_1;
     }
 
-    client.print(filearray);
+    filearray += '\n';
+
+    Serial.print("String size: ");
+    Serial.println(filearray.length());
+
+    Serial.print("Sent: ");
+    Serial.println(client.print(filearray));
 
     bmp.close();
 }
